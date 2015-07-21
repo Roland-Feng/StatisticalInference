@@ -1,0 +1,72 @@
+---
+title: "Untitled"
+author: "Roland Feng"
+date: "Tuesday, July 21, 2015"
+output: pdf_document
+---
+#Course Project for Statistical Inference Part 2
+By Roland Feng
+
+The data is about the growth of teeth. There are 60 rows in the ToothGrowth and there are three colomns corresponding to the length of teeth, dilivery methods(orange juice or ascorbic acid) and dose levels of Vitamin C(0.5,1,2mg).
+
+##Load the ToothGrowth data and perform some basic exploratory data analyses 
+Firtst we load the data into R.
+```{r}
+data(ToothGrowth)
+str(ToothGrowth)
+```
+I decide to explore the relationship between the length and dose. We seperate the data by supp and draw the figures.
+```{r}
+library(ggplot2)
+qplot(dose, len, data=ToothGrowth,facets=.~supp)
+```
+It is obvious from the picture that the length of tooth has a positive relationship with the dose.
+
+##Provide a basic summary of the data.
+We transform the "dose" into a factor show the summary.
+```{r}
+ToothGrowth$dose<-as.factor(ToothGrowth$dose)
+summary(ToothGrowth)
+table(ToothGrowth$dose,ToothGrowth$supp)
+```
+Then we draw some box figure related to the data.
+```{r}
+ggplot(aes(x=dose,y=len),data=ToothGrowth)+geom_boxplot(aes(fill=supp))
+ggplot(aes(x=supp,y=len),data=ToothGrowth)+geom_boxplot(aes(fill=dose))
+```
+
+##Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose
+We will compare the len from the two type of delivery methods. We set the null hypothesis as the delivery has no effect on the length of teeth.
+```{r}
+lapply(split(ToothGrowth$len,ToothGrowth$supp),var)
+```
+So the variance could not be regarded as the same.
+```{r}
+t.test(ToothGrowth$len[ToothGrowth$supp=="OJ"],ToothGrowth$len[ToothGrowth$supp=="VC"],paired=FALSE,var.equal=FALSE)
+```
+p-value is 0.061, and the confidence interval is (-0.171,7.571), which contains 0. So we can not reject the null hypothesis.
+
+Next we compare the len from the dose. The null hypothesis is that the dose does not effect the len.
+```{r}
+lapply(split(ToothGrowth$len,ToothGrowth$dose),var)
+```
+By the same reason, we will not regard the variances as the same.
+
+```{r}
+t.test(ToothGrowth$len[ToothGrowth$dose=="0.5"],ToothGrowth$len[ToothGrowth$dose=="1"],paired=FALSE,var.equal=FALSE)
+t.test(ToothGrowth$len[ToothGrowth$dose=="0.5"],ToothGrowth$len[ToothGrowth$dose=="2"],paired=FALSE,var.equal=FALSE)
+t.test(ToothGrowth$len[ToothGrowth$dose=="1"],ToothGrowth$len[ToothGrowth$dose=="2"],paired=FALSE,var.equal=FALSE)
+```
+The p-values are 1.268e-07, 4.398e-14, 1.906e-05. There are all less than 0.05.
+The confidence intervals are (-11.983781  -6.276219), (-18.15617 -12.83383), (-8.996481 -3.733519). All the confidence intervals do not contain 0. 
+According to all, we can reject the null hypothesis.
+
+##conclusions and the assumptions
+
+###Conclusion
+1. There isn't enough evidence to support the idea that delivery methods have effect on the length of teeth.
+2. The dose level has a positive effect on the length of teeth.
+
+###Assumption
+1. All the measurements are reasonable. The samples is representive and selected randomly.
+2. We set all the variances to be different, which is more objective.

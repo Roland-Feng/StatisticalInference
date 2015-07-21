@@ -1,0 +1,50 @@
+---
+title: "Course Project for Statistical Inference"
+author: "Roland Feng"
+date: "Tuesday, July 21, 2015"
+output: pdf_document
+---
+#Course Project for Statistical Inference
+By Roland Feng
+
+In this report, we try to stimulate the large number theory and the variance of exponential distribution and finally we want to show that the distribution is approximately normal.
+
+During the whole project, we set that lambda=0.2 and we will investigate the distrubution of averages of 40 numbers sampled from exponential distribution.
+
+##Stimulation
+We generate the data and draw the distribution:
+```{r}
+set.seed(6)
+n<-1000
+size<-40
+lambda=0.2
+sample<-matrix(rexp(n*size,0.2),n,size);
+RM<-rowMeans(sample)
+hist(RM, breaks=40,main="Distribution of Averages of Samples")
+```
+
+##Sample Mean versus Theoretical Mean
+We draw the sample mean and theoretical mean on the picture. 
+```{r}
+hist(RM, breaks=40,main="Distribution of Averages of Samples")
+abline(v=1/lambda,col="red",lwd=6)
+abline(v=mean(RM),col="blue",lwd=6)
+```
+The red line is the theoretical mean, which is lambda^(-1)=5; the blue line is sample mean which is 5.0164. We can see that it is very close.
+
+##Sample Variance versus Theoretical Variance
+The variance of the sample is calculated by
+```{r}
+var(RM)
+```
+It is 0.634; the theoretical variance is ((1/lambda)/sqrt(40))^2=0.625. They are really close. If the size is larger, such as let n=10000, the difference will be smaller.
+
+##Distribution
+Here, we draw the line of normal distribution with mean equal to the sample mean and variance equal to the variance of sample variance to show that the distribution is close t o normal distribution.
+```{r}
+x<-seq(min(RM),max(RM),length=100)
+y<-dnorm(x,mean=mean(RM),sd=sd(RM))
+hist(RM, breaks=40,main="Distribution of Averages of Samples",freq=FALSE)
+lines(x,y,col="red",lwd=3)
+```
+We could see that the line fits the hist well. So the distribution of averages of samples is normal.
